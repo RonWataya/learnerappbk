@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const session = require('express-session');
+const https = require('https');
+const fs = require('fs');
 require('dotenv').config();
 
 // We are only importing the single route file that contains both registration and login logic
@@ -37,12 +39,22 @@ app.use(cors({
     origin: '*',
     credentials: true 
 }));
-
+//https
+const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/traininghealthandsafety.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/traininghealthandsafety.com/fullchain.pem')
+};
 // Use the single route file for all authentication-related endpoints
 app.use(registrationRoute); 
 app.use(managementRoute); 
 
 const PORT = process.env.PORT || 3000;
+https.createServer(options, app).listen(PORT, () => {
+    console.log(`HTTPS server running on port ${PORT}`);
+});
+
+/*
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
+*/
